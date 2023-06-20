@@ -1,6 +1,8 @@
-import { line as d3Line, curveMonotoneX as d3CurveMonotoneX } from 'd3-shape'
-import { select as d3Select } from 'd3-selection'
-import { transition } from 'd3-transition'
+import {
+  select as d3Select,
+  line as d3Line,
+  curveMonotoneX as d3CurveMonotoneX,
+} from 'd3'
 
 import isEmpty from 'lodash-es/isEmpty'
 import isArray from 'lodash-es/isArray'
@@ -20,11 +22,6 @@ import {
   configureScale,
 } from '../config/configure'
 
-// ref: https://stackoverflow.com/a/64596738/1410291
-function constructTransition({ duration, ease }) {
-  return transition().duration(duration).ease(ease)
-}
-
 export const update = ({ d3_refs, newValue, config }) => {
   const scale = configureScale(config)
   const ratio = scale(newValue)
@@ -33,12 +30,9 @@ export const update = ({ d3_refs, newValue, config }) => {
   const newAngle = config.minAngle + ratio * range
   // update the pointer
   d3_refs.pointer
-    .transition(
-      constructTransition({
-        duration: config.needleTransitionDuration,
-        ease: getNeedleTransition(config.needleTransition),
-      })
-    )
+    .transition()
+    .duration(config.needleTransitionDuration)
+    .ease(getNeedleTransition(config.needleTransition))
     .attr('transform', `rotate(${newAngle})`)
 
   d3_refs.current_value_text.text(formatCurrentValueText(newValue, config))
@@ -157,16 +151,19 @@ export function _renderLabels({ config, svg, centerTx, r }) {
           ? scale(d)
           : sumArrayTill(tickData, i)
 
-      const newAngle = config.minAngle + ratio * range
+        
+      let newAngle = config.minAngle + 5+ ratio * range 
 
-      return `rotate(${newAngle}) translate(0, ${config.labelInset - r})`
+const veryClose = 10;
+
+      if(ticks[i+1] && ticks[i+1] - ticks[i] <=veryClose  ){
+        newAngle = newAngle -10
+      }
+
+      
+      return `rotate(${newAngle}) translate(0, ${config.labelInset - r } )`
     })
-    // first labelFormat is applied via d3Format
-    // then we will apply custom 'segmentValueFormatter' function
-    // .text(config.labelFormat)
-    .text(value => {
-      return config.segmentValueFormatter(config.labelFormat(value))
-    })
+    .text(d=>d+'%')
     // add class for text label
     .attr('class', 'segment-value')
     // styling stuffs

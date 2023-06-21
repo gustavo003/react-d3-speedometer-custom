@@ -22,6 +22,8 @@ import {
   configureScale,
 } from '../config/configure'
 
+const veryClose = 10
+
 export const update = ({ d3_refs, newValue, config }) => {
   const scale = configureScale(config)
   const ratio = scale(newValue)
@@ -101,6 +103,9 @@ function _renderArcs({ config, svg, centerTx }) {
     .attr('d', arc)
 }
 
+
+
+
 export function _renderLabels({ config, svg, centerTx, r }) {
   const ticks = configureTicks(config)
   const tickData = configureTickData(config)
@@ -141,6 +146,9 @@ export function _renderLabels({ config, svg, centerTx, r }) {
   // normal label rendering
   let lg = svg.append('g').attr('class', 'label').attr('transform', centerTx)
 
+  
+const marged = []
+
   lg.selectAll('text')
     .data(ticks)
     .enter()
@@ -154,14 +162,26 @@ export function _renderLabels({ config, svg, centerTx, r }) {
         
       let newAngle = config.minAngle + 5+ ratio * range 
 
-const veryClose = 10;
+     
 
-      if(ticks[i+1] && ticks[i+1] - ticks[i] <=veryClose  ){
-        newAngle = newAngle -10
+
+      if((ticks[i+1] && (ticks[i+1] - ticks[i] <=veryClose) 
+      ||ticks[i-1]&& ticks[i] - ticks[i-1] <=veryClose) ){
+          if(marged.length==0){
+              newAngle = newAngle -15
+                  marged.push('LEFT')
+          }else if(marged[marged.length-1]=='LEFT'){
+              marged.push('CENTER')
+          }
+          else{marged.push('RIGHT')
+              newAngle = newAngle +12
       }
 
-      
-      return `rotate(${newAngle}) translate(0, ${config.labelInset - r } )`
+
+
+      }
+
+      return `rotate(${newAngle}) translate(0, ${config.labelInset - r  } )`
     })
     .text(d=>d+'%')
     // add class for text label

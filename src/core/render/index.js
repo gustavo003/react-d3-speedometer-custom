@@ -22,7 +22,6 @@ import {
   configureScale,
 } from '../config/configure'
 
-const veryClose = 10
 
 export const update = ({ d3_refs, newValue, config }) => {
   const scale = configureScale(config)
@@ -148,6 +147,8 @@ export function _renderLabels({ config, svg, centerTx, r }) {
 
   
 const marged = []
+const values = []
+const veryClose = config.maxValue  >50?10:3
 
   lg.selectAll('text')
     .data(ticks)
@@ -162,24 +163,30 @@ const marged = []
         
       let newAngle = config.minAngle + 5+ ratio * range 
 
-     
 
 
-      if((ticks[i+1] && (ticks[i+1] - ticks[i] <=veryClose) 
-      ||ticks[i-1]&& ticks[i] - ticks[i-1] <=veryClose) ){
+      if(ticks[i+1] && (ticks[i+1] - ticks[i] <=veryClose) ) {
+
+         
+
           if(marged.length==0){
-              newAngle = newAngle -15
+              newAngle = newAngle - (veryClose == 10? 15:10)
                   marged.push('LEFT')
           }else if(marged[marged.length-1]=='LEFT'){
               marged.push('CENTER')
           }
-          else{marged.push('RIGHT')
-              newAngle = newAngle +12
+        
+    values.push(ticks[i])
+      }
+      if(ticks[i-1] && (ticks[i] - ticks[i-1] <=veryClose ) && 
+      !values.includes(ticks[i])){
+
+          newAngle = newAngle + (veryClose == 10? 15:10)
+
+
       }
 
-
-
-      }
+      
 
       return `rotate(${newAngle}) translate(0, ${config.labelInset - r  } )`
     })

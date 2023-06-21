@@ -173,13 +173,18 @@ const veryClose = config.maxValue  >50?10:3
               newAngle = newAngle - (veryClose == 10? 15:10)
                   marged.push('LEFT')
           }else if(marged[marged.length-1]=='LEFT'){
+              if(ticks[i+1] == config.maxValue){
+                  newAngle = newAngle - (veryClose == 10? 15:10)
+            }
               marged.push('CENTER')
           }
         
     values.push(ticks[i])
       }
-      if(ticks[i-1] && (ticks[i] - ticks[i-1] <=veryClose ) && 
+      if( ticks[i-1] && ticks[i]!=config.maxValue && (ticks[i] - ticks[i-1] <=veryClose ) && 
       !values.includes(ticks[i])){
+
+      
 
           newAngle = newAngle + (veryClose == 10? 15:10)
 
